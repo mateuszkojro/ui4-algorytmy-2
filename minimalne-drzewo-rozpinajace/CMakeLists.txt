@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.19)
+project(minimalne_drzewo_rozpinajace)
+
+set(CMAKE_CXX_STANDARD 14)
+
+add_executable(minimalne_drzewo_rozpinajace main.cpp)
