@@ -36,7 +36,7 @@ public:
     std::vector<Edge *> edges_;
 };
 
-std::vector<Node *> find_mst(std::vector<Edge *> edges, std::vector<Node *> forest, int beg, int end, int count);
+Node *find_mst(std::vector<Edge *> edges, std::vector<Node *> nodes, int beg, int end, int count);
 
 void print_tree(Node *node, Node *from, Edge *edge) {
     std::cout << "Name:\t" << node->name_ << "\tEdge:\t" << edge->cost_
@@ -80,10 +80,7 @@ int main() {
     cin >> beginning >> end;
     cin >> no_passengers;
     auto result = find_mst(edges, nodes, beginning, end, no_passengers);
-    for (Node *tree : result) {
-        std::cout << "New tree" << std::endl;
-        print_tree(tree, tree, tree->edges_[0]);
-    }
+    print_tree(result, result, result->edges_[0]);
 
     return 0;
 }
@@ -127,22 +124,24 @@ Node *find_node(Node *tree, Node *from, int target) {
     return result;
 }
 
-//bool is_mst(Node *tree, Node *from, Node *start, Node *end) {
-//
-//    if (!find_node(tree, from, start->name_))
-//        return false;
-//    if (!find_node(tree, from, start->name_))
-//        return false;
-//    return true;
-//}
+bool is_mst(Node *tree, Node *from, int start, int end) {
 
-//Node *check_forest(std::vector<Node *> forest, Node *start, Node *end) {
-//    for (Node *tree : forest) {
-//        if (is_mst(tree, tree, start, end))
-//            return tree;
-//    }
-//    return nullptr;
-//}
+    if (!find_node(tree, from, start))
+        return false;
+
+    if (!find_node(tree, from, end))
+        return false;
+
+    return true;
+}
+
+Node *check_forest(std::vector<Node *> forest, int start, int end) {
+    for (Node *tree : forest) {
+        if (is_mst(tree, tree, start, end))
+            return tree;
+    }
+    return nullptr;
+}
 
 bool try_connect(std::vector<Node *> &forest, Edge *edge) {
     Node *node1 = nullptr;
@@ -190,26 +189,19 @@ void sort(std::vector<Edge *> &edges) {
     }
 }
 
-std::vector<Node *> find_mst(std::vector<Edge *> edges, std::vector<Node *> forest, int beg, int end, int count) {
+Node * find_mst(std::vector<Edge *> edges, std::vector<Node *> forest, int beg, int end, int count) {
 //    std::sort(edges.begin(), edges.end(), [](const Edge *& one, const Edge *& two) {
 //        return *one < *two;
 //    });
     sort(edges);
 
-    for(auto edge : edges){
-        std::cout << edge->cost_ << std::endl;
-    }
-    //    for (Edge *edge : edges) {
-////        if (check_forest(forest, nodes.size())) {
-////          return true;
-////        }
-//        try_connect(forest, edge);
-//    }
-
+    Node* mst = nullptr;
     while (!edges.empty()) {
         try_connect(forest, edges.back());
         edges.erase(edges.end() - 1);
+        mst = check_forest(forest, beg, end);
+        if (mst)
+            return mst;
     }
-
-    return forest;
+    return mst;
 }
