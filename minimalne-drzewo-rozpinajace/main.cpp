@@ -67,7 +67,7 @@ int main() {
     vector<Edge *> edges;
 
     nodes.reserve(no_nodes);
-    for (int i = 0; i < no_nodes; i++) {
+    for (int i = 1; i <= no_nodes; i++) {
         nodes.push_back(new Node(i));
     }
 
@@ -213,6 +213,7 @@ Node *find_mst(std::vector<Edge *> edges, std::vector<Node *> forest, int beg, i
 int min_path(Node *curent, Node *from, int min, int to);
 
 int min_path(Node *curent, Node *from, int min, int to) {
+    std::cout << "node: " << curent->name_ << std::endl;
     for (auto edge : curent->edges_) {
         if (edge->name1_ == curent->name_) {
             if (edge->two_ == from)
@@ -223,7 +224,8 @@ int min_path(Node *curent, Node *from, int min, int to) {
             } else {
                 min = edge->cost_ < min ? edge->cost_ : min;
                 auto new_result = min_path(edge->two_, curent, min, to);
-                return new_result < min ? new_result : min;
+                if(new_result != -1)
+                    return new_result < min ? new_result : min;
             }
         } else {
             if (edge->one_ == from)
@@ -234,11 +236,12 @@ int min_path(Node *curent, Node *from, int min, int to) {
             } else {
                 min = edge->cost_ < min ? edge->cost_ : min;
                 auto new_result = min_path(edge->one_, curent, min, to);
-                return new_result < min ? new_result : min;
+                if (new_result != -1)
+                    return new_result < min ? new_result : min;
             }
         }
     }
-    return min;
+    return -1;
 }
 
 int find_min_path(Node *tree, int from, int to) {
