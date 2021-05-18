@@ -221,7 +221,9 @@ int min_path(Node *curent, Node *from, int min, int to) {
                 min = edge->cost_ < min ? edge->cost_ : min;
                 return min;
             } else {
-                return min_path(edge->two_, curent, min, to);
+                min = edge->cost_ < min ? edge->cost_ : min;
+                auto new_result = min_path(edge->two_, curent, min, to);
+                return new_result < min ? new_result : min;
             }
         } else {
             if (edge->one_ == from)
@@ -230,7 +232,9 @@ int min_path(Node *curent, Node *from, int min, int to) {
                 min = edge->cost_ < min ? edge->cost_ : min;
                 return min;
             } else {
-                return min_path(edge->one_, curent, min, to);
+                min = edge->cost_ < min ? edge->cost_ : min;
+                auto new_result = min_path(edge->one_, curent, min, to);
+                return new_result < min ? new_result : min;
             }
         }
     }
