@@ -54,6 +54,8 @@ void print_tree(Node *node, Node *from, Edge *edge) {
     }
 }
 
+int find_min_path(Node *tree, int from, int to);
+
 int main() {
     using namespace std;
 
@@ -81,9 +83,11 @@ int main() {
     cin >> no_passengers;
     auto result = find_mst(edges, nodes, beginning, end, no_passengers);
     print_tree(result, result, result->edges_[0]);
-
+    int min_path = find_min_path(result, beginning, end);
+    std::cout << "min_path=" << min_path << std::endl;
     return 0;
 }
+
 
 void connect(Node *node1, Node *node2, Edge *edge) {
     assert(edge->name1_ == node1->name_ || edge->name2_ == node1->name_);
@@ -179,7 +183,7 @@ bool try_connect(std::vector<Node *> &forest, Edge *edge) {
 
 void sort(std::vector<Edge *> &edges) {
     for (int i = 0; i < edges.size(); i++) {
-        for (int j = 0; j < edges.size() ; j++) {
+        for (int j = 0; j < edges.size(); j++) {
             if (*edges[i] < *edges[j]) {
                 Edge *temp = edges[i];
                 edges[i] = edges[j];
@@ -189,13 +193,13 @@ void sort(std::vector<Edge *> &edges) {
     }
 }
 
-Node * find_mst(std::vector<Edge *> edges, std::vector<Node *> forest, int beg, int end, int count) {
+Node *find_mst(std::vector<Edge *> edges, std::vector<Node *> forest, int beg, int end, int count) {
 //    std::sort(edges.begin(), edges.end(), [](const Edge *& one, const Edge *& two) {
 //        return *one < *two;
 //    });
     sort(edges);
 
-    Node* mst = nullptr;
+    Node *mst = nullptr;
     while (!edges.empty()) {
         try_connect(forest, edges.back());
         edges.erase(edges.end() - 1);
@@ -205,3 +209,37 @@ Node * find_mst(std::vector<Edge *> edges, std::vector<Node *> forest, int beg, 
     }
     return mst;
 }
+
+int min_path(Node *curent, Node *from, int min, int to);
+
+int min_path(Node *curent, Node *from, int min, int to) {
+    for (auto edge : curent->edges_) {
+        if (edge->name1_ == curent->name_) {
+            if (edge->two_ == from)
+                continue;
+            if (edge->two_->name_ == to) {
+                min = edge->cost_ < min ? edge->cost_ : min;
+                return min;
+            } else {
+                return min_path(edge->two_, curent, min, to);
+            }
+        } else {
+            if (edge->one_ == from)
+                continue;
+            if (edge->one_->name_ == to) {
+                min = edge->cost_ < min ? edge->cost_ : min;
+                return min;
+            } else {
+                return min_path(edge->one_, curent, min, to);
+            }
+        }
+    }
+    return min;
+}
+
+int find_min_path(Node *tree, int from, int to) {
+    auto start_node = find_node(tree, tree, from);
+    return min_path(start_node, start_node, INT32_MAX, to);
+}
+
+
