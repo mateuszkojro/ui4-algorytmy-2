@@ -213,7 +213,7 @@ Node *find_mst(std::vector<Edge *> edges, std::vector<Node *> forest, int beg, i
 int min_path(Node *curent, Node *from, int min, int to);
 
 int min_path(Node *curent, Node *from, int min, int to) {
-    std::cout << "node: " << curent->name_ << std::endl;
+    std::cout  << "\tfrom:"<< from->name_ << "to node: " << curent->name_ <<std::endl;
     for (auto edge : curent->edges_) {
         if (edge->name1_ == curent->name_) {
             if (edge->two_ == from)
