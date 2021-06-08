@@ -8,7 +8,6 @@ void heap_sort(vector<int> &array);
 
 void form_heap(vector<int> &tree,  int index,  int tree_size);
 
-
 int left_child_index(int index);
 
 int right_child_index(int index);

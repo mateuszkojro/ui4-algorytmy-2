@@ -1,9 +1,13 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <thread>
 #include <cassert>
+#include <chrono>
+#include <map>
 
 class Node;
+
 class Edge;
 
 class Edge {
@@ -18,6 +22,7 @@ public:
     bool operator<(const Edge &other) const {
         return this->cost_ < other.cost_;
     }
+
 
     int cost_;
     int name1_;
@@ -36,56 +41,56 @@ public:
     std::vector<Edge *> edges_;
 };
 
-using Tree = Node*;
+using Tree = Node *;
 using Forest = std::vector<Tree>;
 
 
-Node *find_mst(std::vector<Edge *> edges, Forest forest, int beg, int end, int count);
+Node *find_mst(std::vector<Edge *> edges, std::vector<Node *> forest);
 
 Node *find_node(Node *tree, Node *from, int target);
 
-Node *check_forest(Forest forest, int start, int end);
-
 bool try_connect(Forest &forest, Edge *edge);
+
 void connect(Node *node1, Node *node2, Edge *edge);
 
-void print_tree(Node *node, Node *from, Edge *edge);
+void print_tree(Node *node, std::map<int, std::string> &node_id);//
 
-bool is_mst(Node *tree, Node *from, int start, int end);
 
-int min_path(Node *curent, Node *from, int min, int to);
-
-int find_min_path(Node *tree, int from, int to);
 
 int main() {
 
+    std::map<int, std::string> node_id;
 
     // todo how many
-    int no_nodes, no_edges;
-    std::cin >> no_nodes >> no_edges;
+    int no_nodes;
+    std::cin >> no_nodes;
 
     std::vector<Node *> nodes;
     std::vector<Edge *> edges;
 
     nodes.reserve(no_nodes);
-    for (int i = 1; i <= no_nodes; i++) {
-        nodes.push_back(new Node(i));
+    int temp;
+    std::string name;
+    for (int i = 0; i < no_nodes; i++) {
+        std::cin >> temp;
+        std::cin >> name;
+        nodes.push_back(new Node(temp));
+        node_id.insert({temp, name});
     }
+    int no_edges;
+    std::cin >> no_edges;
 
-    int itr = no_edges;
-    while (itr--) {
-        int from, to, cost;
+    int from, to, cost;
+    for (int i = 0; i < no_edges; i++) {
         std::cin >> from >> to >> cost;
         edges.push_back(new Edge(from, to, cost));
     }
 
-    int beginning, end, no_passengers;
-    std::cin >> beginning >> end;
-    std::cin >> no_passengers;
-    auto result = find_mst(edges, nodes, beginning, end, no_passengers);
-    print_tree(result, result, result->edges_[0]);
-    int min_path = find_min_path(result, beginning, end);
-    std::cout << "min_path=" << min_path << std::endl;
+
+    auto result = find_mst(edges, nodes);
+
+    print_tree(result, node_id);
+
     return 0;
 }
 
@@ -93,22 +98,30 @@ int main() {
 void connect(Node *node1, Node *node2, Edge *edge) {
     assert(edge->name1_ == node1->name_ || edge->name2_ == node1->name_);
     assert(edge->name1_ == node2->name_ || edge->name2_ == node2->name_);
+
     edge->one_ = node1;
     edge->two_ = node2;
+
     node1->edges_.push_back(edge);
     node2->edges_.push_back(edge);
 }
 
 Node *find_node(Node *tree, Node *from, int target) {
     Node *result = nullptr;
+
     if (tree->name_ == target)
         return tree;
+
     for (Edge *child : tree->edges_) {
+
         if (child->name1_ == tree->name_) {
+
             if (child->two_ == from)
                 continue;
+
             if (child->two_->name_ == target)
                 return child->two_;
+
             else {
                 result = find_node(child->two_, tree, target);
                 if (result)
@@ -117,6 +130,7 @@ Node *find_node(Node *tree, Node *from, int target) {
         } else {
             if (child->one_ == from)
                 continue;
+
             if (child->one_->name_ == target)
                 return child->one_;
             else {
@@ -138,14 +152,16 @@ bool try_connect(Forest &forest, Edge *edge) {
 
     for (Node *tree : forest) {
         tree_idx1++;
-        node1 = find_node(tree, tree, edge->name1_);
+        node1 = find_node(tree, forest[tree_idx1], edge->name1_);
+
         if (node1)
             break;
     }
 
     for (Node *tree : forest) {
         tree_idx2++;
-        node2 = find_node(tree, tree, edge->name2_);
+        node2 = find_node(tree, forest[tree_idx2], edge->name2_);
+
         if (node2)
             break;
     }
@@ -158,6 +174,7 @@ bool try_connect(Forest &forest, Edge *edge) {
 
     if (!node2)
         return false;
+
     connect(node1, node2, edge);
     forest.erase(forest.begin() + tree_idx2);
     return true;
@@ -165,70 +182,46 @@ bool try_connect(Forest &forest, Edge *edge) {
 
 void sort(std::vector<Edge *> &edges) {
     for (int i = 0; i < edges.size(); i++) {
+
         for (int j = 0; j < edges.size(); j++) {
+
             if (*edges[i] < *edges[j]) {
+
                 Edge *temp = edges[i];
                 edges[i] = edges[j];
                 edges[j] = temp;
+
             }
         }
     }
 }
 
-Node *find_mst(std::vector<Edge *> edges, std::vector<Node *> forest, int beg, int end, int count) {
-//    std::sort(edges.begin(), edges.end(), [](const Edge *& one, const Edge *& two) {
-//        return *one < *two;
-//    });
+Node *find_mst(std::vector<Edge *> edges, std::vector<Node *> forest) {
+
+
     sort(edges);
 
     Node *mst = nullptr;
+
     while (!edges.empty()) {
-        try_connect(forest, edges.back());
-        edges.erase(edges.end() - 1);
-        mst = check_forest(forest, beg, end);
-        if (mst)
-            return mst;
+        try_connect(forest, edges.front());
+
+        edges.erase(edges.begin());
+
+        if (forest.size() == 1) break;
+
     }
-    return mst;
+    return forest[0];
 }
 
 
+void print_tree(Node *node,std::map<int, std::string> &node_id) {
 
-int min_path(Node *curent, Node *from, int min, int to) {
-    std::cout  << "\tfrom:"<< from->name_ << "to node: " << curent->name_ <<std::endl;
-    for (auto edge : curent->edges_) {
-        if (edge->name1_ == curent->name_) {
-            if (edge->two_ == from)
-                continue;
-            if (edge->two_->name_ == to) {
-                min = edge->cost_ < min ? edge->cost_ : min;
-                return min;
-            } else {
-                min = edge->cost_ < min ? edge->cost_ : min;
-                auto new_result = min_path(edge->two_, curent, min, to);
-                if(new_result != -1)
-                    return new_result < min ? new_result : min;
-            }
-        } else {
-            if (edge->one_ == from)
-                continue;
-            if (edge->one_->name_ == to) {
-                min = edge->cost_ < min ? edge->cost_ : min;
-                return min;
-            } else {
-                min = edge->cost_ < min ? edge->cost_ : min;
-                auto new_result = min_path(edge->one_, curent, min, to);
-                if (new_result != -1)
-                    return new_result < min ? new_result : min;
-            }
-        }
+    for (Edge *child : node->edges_) {
+
+        std::cout << node_id[node->name_] << node_id[child->name1_] <<child->cost_ <<std::endl;
+
+        print_tree(child->two_, node_id);
+
     }
-    return -1;
 }
-
-int find_min_path(Node *tree, int from, int to) {
-    auto start_node = find_node(tree, tree, from);
-    return min_path(start_node, start_node, INT32_MAX, to);
-}
-
-
