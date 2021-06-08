@@ -41,7 +41,9 @@ using Forest = std::vector<Tree>;
 
 
 Node *find_mst(std::vector<Edge *> edges, Forest forest, int beg, int end, int count);
+
 Node *find_node(Node *tree, Node *from, int target);
+
 Node *check_forest(Forest forest, int start, int end);
 
 bool try_connect(Forest &forest, Edge *edge);
@@ -51,17 +53,19 @@ void print_tree(Node *node, Node *from, Edge *edge);
 
 bool is_mst(Node *tree, Node *from, int start, int end);
 
+int min_path(Node *curent, Node *from, int min, int to);
+
 int find_min_path(Node *tree, int from, int to);
 
 int main() {
-    using namespace std;
+
 
     // todo how many
     int no_nodes, no_edges;
-    cin >> no_nodes >> no_edges;
+    std::cin >> no_nodes >> no_edges;
 
-    vector<Node *> nodes;
-    vector<Edge *> edges;
+    std::vector<Node *> nodes;
+    std::vector<Edge *> edges;
 
     nodes.reserve(no_nodes);
     for (int i = 1; i <= no_nodes; i++) {
@@ -71,13 +75,13 @@ int main() {
     int itr = no_edges;
     while (itr--) {
         int from, to, cost;
-        cin >> from >> to >> cost;
+        std::cin >> from >> to >> cost;
         edges.push_back(new Edge(from, to, cost));
     }
 
     int beginning, end, no_passengers;
-    cin >> beginning >> end;
-    cin >> no_passengers;
+    std::cin >> beginning >> end;
+    std::cin >> no_passengers;
     auto result = find_mst(edges, nodes, beginning, end, no_passengers);
     print_tree(result, result, result->edges_[0]);
     int min_path = find_min_path(result, beginning, end);
@@ -188,7 +192,7 @@ Node *find_mst(std::vector<Edge *> edges, std::vector<Node *> forest, int beg, i
     return mst;
 }
 
-int min_path(Node *curent, Node *from, int min, int to);
+
 
 int min_path(Node *curent, Node *from, int min, int to) {
     std::cout  << "\tfrom:"<< from->name_ << "to node: " << curent->name_ <<std::endl;

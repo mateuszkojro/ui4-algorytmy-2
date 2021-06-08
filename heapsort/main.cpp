@@ -1,57 +1,53 @@
-
-
 #include <iostream>
-#include <ctime>
 #include <vector>
 
+using namespace std;
+
+void heap_sort(vector<int> &array);
 
 
-void heap_sort(std::vector<int> &array);
+void form_heap(vector<int> &tree,  int index,  int tree_size);
 
 
-void create_heap(std::vector<int> &array, size_t index, size_t array_size);
+int left_child_index(int index);
 
+int right_child_index(int index);
 
-size_t left(size_t index);
+void form_correct_tree(vector<int> &tree,  int index,  int tree_size);
 
+void show_heap(vector<int> &tree, int tree_size);
 
-size_t right(size_t index);
-
-void swap_with_children(std::vector<int> &array, size_t index, size_t array_size);
-
-void show_heap(std::vector<int> &array, size_t array_size);
-
-
-/// main
 int main() {
-    srand(time(NULL));
-
-    unsigned N;
-    std::cin >> N;
 
 
-    std::vector<int> sort_array;
-    for (int i = 0; i < N; i++) {
+    int no_tests;
+    cin >> no_tests;
 
-        int sort_array_size;
-        int temp_value;
-        std::cin >> sort_array_size ;
+    vector<int> sort_array;
+
+    int sort_array_size;
+    int temp_value;
+
+    for (int i = 0; i < no_tests; i++) {
+
+        cin >> sort_array_size;
+        sort_array.reserve(sort_array_size);
 
         for (int j = 0; j < sort_array_size; j++) {
 
 
-            std::cin >> temp_value;
+            cin >> temp_value;
             sort_array.push_back(temp_value);
 
 
         }
         heap_sort(sort_array);
 
-        for (auto s:sort_array)
-            std::cout << s << "\t";
+        for (auto i:sort_array)
+            cout << i << "\t";
 
-        std::cout << std::endl;
-        std::cout << std::endl;
+        cout << endl;
+        cout << endl;
         sort_array.clear();
     }
 
@@ -59,74 +55,74 @@ int main() {
 }
 
 
-size_t left(const size_t index) {
+int left_child_index(const int index) {
     return 2 * index + 1;
 
 }
 
-size_t right(const size_t index) {
+int right_child_index(const int index) {
     return 2 * index + 2;
 }
 
 
-void heap_sort(std::vector<int> &array) {
+void heap_sort(vector<int> &array) {
     for (int i = array.size(); i >= 1; --i) {
 
-        create_heap(array, 0, i);
+        form_heap(array, 0, i);
         show_heap(array, i);
-        std::swap(array[0], array[i - 1]);
+        swap(array[0], array[i - 1]);
     }
 }
 
 
-void swap_with_children(std::vector<int> &array, const size_t index, const size_t array_size) {
+void form_correct_tree(vector<int> &tree, const int index, const int tree_size) {
 
 
-    size_t left_index = left(index);
-    size_t right_index = right(index);
+    int left_child = left_child_index(index);
+    int right_child = right_child_index(index);
 
 
-    if (left_index < array_size)
-        if (array[left_index] > array[index]) {
+    if (left_child < tree_size)
+        if (tree[left_child] > tree[index]) {
 
-            std::swap(array[left_index], array[index]);
-            swap_with_children(array, left_index, array_size);
+            swap(tree[left_child], tree[index]);
+            form_correct_tree(tree, left_child, tree_size);
 
         }
 
-    if (right_index < array_size)
-        if (array[right_index] > array[index]) {
+    if (right_child < tree_size)
+        if (tree[right_child] > tree[index]) {
 
-            std::swap(array[right_index], array[index]);
-            swap_with_children(array, right_index, array_size);
+            swap(tree[right_child], tree[index]);
+            form_correct_tree(tree, right_child, tree_size);
 
         }
 }
 
 
-void create_heap(std::vector<int> &array, const size_t index, const size_t array_size) {
-    size_t left_index = left(index);
-    size_t right_index = right(index);
+void form_heap(vector<int> &tree, const int index, const int tree_size) {
+    int left_index = left_child_index(index);
+    int right_index = right_child_index(index);
 
 
-    if (left_index < array_size)
-        create_heap(array, left_index, array_size);
+    if (left_index < tree_size)
+        form_heap(tree, left_index, tree_size);
 
-    if (right_index < array_size)
-        create_heap(array, right_index, array_size);
+    if (right_index < tree_size)
+        form_heap(tree, right_index, tree_size);
 
-    swap_with_children(array, index, array_size);
+    form_correct_tree(tree, index, tree_size);
 
 }
 
 
-void show_heap(std::vector<int> &array, size_t array_size) {
-    if (array_size < 2)return;
-    for (int i = 0; i < array_size; i++) {
+void show_heap(vector<int> &tree, int tree_size) {
+    if (tree_size < 2) return;
+    for (int i = 0; i < tree_size; i++) {
 
-        std::cout << array[i] << "\t";
+        cout << tree[i] << "\t";
     }
-    std::cout << std::endl;
+    cout << endl;
 
 
 }
