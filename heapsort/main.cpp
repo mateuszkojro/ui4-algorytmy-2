@@ -1,55 +1,25 @@
-//
-// Created by pc on 17.04.2021.
-//
-// i'm done trying
-// i've tried before now i'm done
+
 
 #include <iostream>
 #include <ctime>
 #include <vector>
 
 
-/// sort's array using heap algorithm
-/// \return sort's given array
-/// \param array to sort
-template<class T>
-void heap_sort(std::vector<T> &array);
 
-/// recursively checks if given index is bigger than it's children
-/// used to create heap aut of given array
-/// \return creates heap out of array
-/// \param array to be hyped
-/// \param index to be checked for heap correctness
-/// \param array_size virtual array size, due to nature of algorithm array.size() isn't the correct size of used array
-template<class T>
-void create_heap(std::vector<T> &array, size_t index, size_t array_size);
+void heap_sort(std::vector<int> &array);
 
-/// \return left children to the index
-/// \param index node to witch children will be found
+
+void create_heap(std::vector<int> &array, size_t index, size_t array_size);
+
+
 size_t left(size_t index);
 
-/// \return right children to the index
-/// \param index node to witch children will be found
+
 size_t right(size_t index);
 
+void swap_with_children(std::vector<int> &array, size_t index, size_t array_size);
 
-/// checks for correct order of nodes 
-/// if value of any of children is bigger than value under index
-/// in case of incorrect order meaning child has bigger value than father
-/// swaps values between father and child
-/// \param array to be checked
-/// \param index of father in array
-/// \param array_size virtual array size, due to nature of algorithm array.size() isn't the correct size of used array
-template<class T>
-void swap_with_children(std::vector<T> &array, size_t index, size_t array_size);
-
-/// prints given heap onto console using std::cout
-/// order of nodes is defined in asd2_problem2.pdf
-/// \important given class T must be compatible with sdt::cout 
-/// \param array heap to be printed 
-/// \param array_size virtual array size, due to nature of algorithm array.size() isn't the correct size of used array
-template<class T>
-void show_heap(std::vector<T> &array, size_t array_size);
+void show_heap(std::vector<int> &array, size_t array_size);
 
 
 /// main
@@ -60,22 +30,29 @@ int main() {
     std::cin >> N;
 
 
-    std::vector<int> to_be_sorted;
+    std::vector<int> sort_array;
     for (int i = 0; i < N; i++) {
-        int k;
-        int sort;
-        std::cin >> k ;
-        for (int j = 0; j < k; j++) {
-            std::cin >>sort;
-            to_be_sorted.push_back(sort);
+
+        int sort_array_size;
+        int temp_value;
+        std::cin >> sort_array_size ;
+
+        for (int j = 0; j < sort_array_size; j++) {
+
+
+            std::cin >> temp_value;
+            sort_array.push_back(temp_value);
 
 
         }
-        heap_sort(to_be_sorted);
-        for (auto s:to_be_sorted) std::cout << s << "\t";
+        heap_sort(sort_array);
+
+        for (auto s:sort_array)
+            std::cout << s << "\t";
+
         std::cout << std::endl;
         std::cout << std::endl;
-        to_be_sorted.clear();
+        sort_array.clear();
     }
 
 
@@ -91,8 +68,8 @@ size_t right(const size_t index) {
     return 2 * index + 2;
 }
 
-template<class T>
-void heap_sort(std::vector<T> &array) {
+
+void heap_sort(std::vector<int> &array) {
     for (int i = array.size(); i >= 1; --i) {
 
         create_heap(array, 0, i);
@@ -101,27 +78,33 @@ void heap_sort(std::vector<T> &array) {
     }
 }
 
-template<class T>
-void swap_with_children(std::vector<T> &array, const size_t index, const size_t array_size) {
+
+void swap_with_children(std::vector<int> &array, const size_t index, const size_t array_size) {
+
+
     size_t left_index = left(index);
     size_t right_index = right(index);
 
 
     if (left_index < array_size)
         if (array[left_index] > array[index]) {
+
             std::swap(array[left_index], array[index]);
             swap_with_children(array, left_index, array_size);
+
         }
 
     if (right_index < array_size)
         if (array[right_index] > array[index]) {
+
             std::swap(array[right_index], array[index]);
             swap_with_children(array, right_index, array_size);
+
         }
 }
 
-template<class T>
-void create_heap(std::vector<T> &array, const size_t index, const size_t array_size) {
+
+void create_heap(std::vector<int> &array, const size_t index, const size_t array_size) {
     size_t left_index = left(index);
     size_t right_index = right(index);
 
@@ -136,8 +119,8 @@ void create_heap(std::vector<T> &array, const size_t index, const size_t array_s
 
 }
 
-template<class T>
-void show_heap(std::vector<T> &array, size_t array_size) {
+
+void show_heap(std::vector<int> &array, size_t array_size) {
     if (array_size < 2)return;
     for (int i = 0; i < array_size; i++) {
 
