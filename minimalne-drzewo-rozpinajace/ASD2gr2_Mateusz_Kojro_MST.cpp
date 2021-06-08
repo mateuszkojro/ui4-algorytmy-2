@@ -18,7 +18,7 @@ public:
             two_(nullptr) {};
 
     bool operator<(const Edge &other) const {
-        return this->cost_ > other.cost_;
+        return this->cost_ > other.cost_; // that's evil
     }
 
     int cost_;
